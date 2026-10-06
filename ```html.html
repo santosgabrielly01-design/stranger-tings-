@@ -1,0 +1,291 @@
+```html
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz: Qual é o seu Estilo Musical?</title>
+  <style>
+    :root {
+      --bg-color: #0f172a;
+      --card-bg: #1e293b;
+      --accent-color: #f43f5e;
+      --accent-hover: #e11d48;
+      --text-color: #f8fafc;
+      --subtext-color: #94a3b8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .quiz-container {
+      background-color: var(--card-bg);
+      width: 100%;
+      max-width: 600px;
+      border-radius: 16px;
+      padding: 32px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    }
+
+    .quiz-header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .quiz-header h1 {
+      font-size: 1.8rem;
+      margin-bottom: 8px;
+      color: var(--accent-color);
+    }
+
+    .quiz-header p {
+      color: var(--subtext-color);
+      font-size: 0.95rem;
+    }
+
+    .question {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .option-btn {
+      background-color: rgba(255, 255, 255, 0.05);
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 14px 18px;
+      color: var(--text-color);
+      font-size: 1rem;
+      text-align: left;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .option-btn:hover {
+      background-color: var(--accent-color);
+      border-color: var(--accent-color);
+      transform: translateY(-2px);
+    }
+
+    .progress-bar {
+      height: 6px;
+      background-color: rgba(255, 255, 255, 0.1);
+      border-radius: 3px;
+      margin-top: 24px;
+      overflow: hidden;
+    }
+
+    .progress {
+      height: 100%;
+      background-color: var(--accent-color);
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    .result-container {
+      text-align: center;
+    }
+
+    .result-genre {
+      font-size: 2rem;
+      color: var(--accent-color);
+      margin: 16px 0;
+    }
+
+    .result-desc {
+      color: var(--subtext-color);
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }
+
+    .restart-btn {
+      background-color: var(--accent-color);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background-color 0.2s;
+    }
+
+    .restart-btn:hover {
+      background-color: var(--accent-hover);
+    }
+
+    .hide {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="quiz-container">
+    <div id="quiz">
+      <div class="quiz-header">
+        <h1>Descubra Seu Estilo Musical</h1>
+        <p>Responda de acordo com o seu estilo pessoal</p>
+      </div>
+
+      <div class="question" id="question-text">Carregando pergunta...</div>
+
+      <div class="options" id="options-container">
+        <!-- As opções serão geradas dinamicamente pelo JS -->
+      </div>
+
+      <div class="progress-bar">
+        <div class="progress" id="progress"></div>
+      </div>
+    </div>
+
+    <div id="result" class="result-container hide">
+      <h2>Seu estilo musical ideal é:</h2>
+      <div class="result-genre" id="result-genre">Gênero</div>
+      <p class="result-desc" id="result-desc">Descrição do estilo...</p>
+      <button class="restart-btn" onclick="restartQuiz()">Refazer Quiz</button>
+    </div>
+  </div>
+
+  <script>
+    const questions = [
+      {
+        question: "Qual é a sua roupa favorita para o dia a dia?",
+        options: [
+          { text: "Jaqueta de couro, jeans rasgado e coturno", genre: "Rock" },
+          { text: "Roupas oversized, streetwear, tênis moderno e boné", genre: "Hip-Hop / Rap" },
+          { text: "Looks coloridos, peças que estão na moda e acessórios marcantes", genre: "Pop" },
+          { text: "Roupas confortáveis, tons terrosos e visual minimalista/vintage", genre: "Indie / MPB" }
+        ]
+      },
+      {
+        question: "Qual é o seu rolê perfeito no fim de semana?",
+        options: [
+          { text: "Ir a um show underground ou barzinho com som ao vivo", genre: "Rock" },
+          { text: "Uma festa com os amigos ou evento de rua com muita energia", genre: "Hip-Hop / Rap" },
+          { text: "Uma balada agitada para dançar até o dia clarear", genre: "Pop" },
+          { text: "Um festival alternativo ao ar livre ou um café aconchegante", genre: "Indie / MPB" }
+        ]
+      },
+      {
+        question: "Como você prefere decorar o seu quarto?",
+        options: [
+          { text: "Pôsteres de bandas, instrumentos e iluminação mais escura", genre: "Rock" },
+          { text: "Coleções de sneakers, arte urbana e luzes LED neon", genre: "Hip-Hop / Rap" },
+          { text: "Cores vibrantes, quadros modernos e espaço bem iluminado", genre: "Pop" },
+          { text: "Plantas, discos de vinil e luzes quentes e suaves", genre: "Indie / MPB" }
+        ]
+      },
+      {
+        question: "Qual atitude melhor descreve a sua personalidade?",
+        options: [
+          { text: "Intenso(a), autêntico(a) e meio rebelde", genre: "Rock" },
+          { text: "Confiante, direto(a) e focado(a) nas minhas conquistas", genre: "Hip-Hop / Rap" },
+          { text: "Animado(a), sociável e o centro das atenções", genre: "Pop" },
+          { text: "Calmo(a), reflexivo(a) e muito criativo(a)", genre: "Indie / MPB" }
+        ]
+      }
+    ];
+
+    const resultsData = {
+      "Rock": {
+        desc: "Você tem uma energia forte, autêntica e não tem medo de se expressar. Gosta de atitude, vocais marcantes e guitarras potentes."
+      },
+      "Hip-Hop / Rap": {
+        desc: "Seu estilo é urbano, forte e cheio de personalidade. Você valoriza letras marcantes, ritmo, autenticidade e a cultura streetwear."
+      },
+      "Pop": {
+        desc: "Você ama o que é divertido, dinâmico e contagiante. Está sempre por dentro das tendências e adora ritmos feitos para dançar e cantar junto."
+      },
+      "Indie / MPB": {
+        desc: "Você é uma pessoa profunda, sentimental e valoriza a estética e a arte. Prefere sonoridades mais calmas, melódicas e cheias de significado."
+      }
+    };
+
+    let currentQuestionIndex = 0;
+    const scores = { "Rock": 0, "Hip-Hop / Rap": 0, "Pop": 0, "Indie / MPB": 0 };
+
+    const questionTextEl = document.getElementById("question-text");
+    const optionsContainerEl = document.getElementById("options-container");
+    const progressEl = document.getElementById("progress");
+    const quizEl = document.getElementById("quiz");
+    const resultEl = document.getElementById("result");
+    const resultGenreEl = document.getElementById("result-genre");
+    const resultDescEl = document.getElementById("result-desc");
+
+    function loadQuestion() {
+      const currentQuestion = questions[currentQuestionIndex];
+      questionTextEl.textContent = currentQuestion.question;
+      optionsContainerEl.innerHTML = "";
+
+      currentQuestion.options.forEach(option => {
+        const button = document.createElement("button");
+        button.classList.add("option-btn");
+        button.textContent = option.text;
+        button.onclick = () => selectOption(option.genre);
+        optionsContainerEl.appendChild(button);
+      });
+
+      const progressPercent = ((currentQuestionIndex) / questions.length) * 100;
+      progressEl.style.width = `${progressPercent}%`;
+    }
+
+    function selectOption(genre) {
+      scores[genre]++;
+      currentQuestionIndex++;
+
+      if (currentQuestionIndex < questions.length) {
+        loadQuestion();
+      } else {
+        showResult();
+      }
+    }
+
+    function showResult() {
+      progressEl.style.width = "100%";
+      quizEl.classList.add("hide");
+      resultEl.classList.remove("hide");
+
+      const winningGenre = Object.keys(scores).reduce((a, b) => scores[a] > scores[b] ? a : b);
+
+      resultGenreEl.textContent = winningGenre;
+      resultDescEl.textContent = resultsData[winningGenre].desc;
+    }
+
+    function restartQuiz() {
+      currentQuestionIndex = 0;
+      for (let genre in scores) {
+        scores[genre] = 0;
+      }
+      resultEl.classList.add("hide");
+      quizEl.classList.remove("hide");
+      loadQuestion();
+    }
+
+    // Inicializa o quiz
+    loadQuestion();
+  </script>
+</body>
+</html>
+
+```
